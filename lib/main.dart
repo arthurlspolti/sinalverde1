@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
+
 
 void main() {
   runApp(MaterialApp(home: LoadingScreen()));
@@ -87,7 +89,9 @@ class HomePageWidget extends StatelessWidget {
           top: true,
           child: Center(
             child: ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
+                final player = AudioPlayer();
+                await player.play(UrlSource('https://file-examples.com/storage/fe7bb0e37864d66f29c40ee/2017/11/file_example_WAV_1MG.wav'));
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => MyTouchPage()),

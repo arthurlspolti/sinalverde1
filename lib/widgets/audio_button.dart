@@ -7,9 +7,12 @@ class AudioButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () async {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => MyTouchPage()),
+        );
         final player = AudioPlayer();
-        await player.play(UrlSource('https://file-examples.com/storage/fe7bb0e37864d66f29c40ee/2017/11/file_example_WAV_1MG.wav'));
-        // Não é necessário navegar para MyTouchPage aqui
+        await player.play(UrlSource('https://file-examples.com/storage/fe7bb0e37864d66f29c40ee/2017/11/file_example_WAV_1MG'));
       },
       child: SizedBox(
         height: 1800,

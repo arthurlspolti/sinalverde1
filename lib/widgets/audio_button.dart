@@ -2,17 +2,40 @@ import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import '../screens/my_touch_page.dart'; // Importe a página correta
 
-class AudioButton extends StatelessWidget {
+class AudioButton extends StatefulWidget {
+  @override
+  _AudioButtonState createState() => _AudioButtonState();
+}
+
+class _AudioButtonState extends State<AudioButton> {
+  AudioPlayer _audioPlayer = AudioPlayer();
+
+  @override
+  void initState() {
+    super.initState();
+    _audioPlayer = AudioPlayer();
+  }
+
+  Future<void> _playAudio() async {
+    await _audioPlayer.play(AssetSource('apr.mp3'));
+    await _audioPlayer.setVolume(1);
+  }
+
+  @override
+  void dispose() {
+    _audioPlayer.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () async {
+        await _playAudio();
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => MyTouchPage()),
         );
-        final player = AudioPlayer();
-        await player.play(UrlSource('https://file-examples.com/storage/fe7bb0e37864d66f29c40ee/2017/11/file_example_WAV_1MG'));
       },
       child: SizedBox(
         height: 1800,

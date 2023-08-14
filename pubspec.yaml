@@ -22,6 +22,7 @@ flutter:
   assets:
   - assets/microfone.png
   - assets/sinal.png
+  - assets/apr.mp3
 
 flutter_icons:
   android: true

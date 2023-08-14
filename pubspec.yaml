@@ -10,6 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
   audioplayers: ^5.1.0
+  flutter_launcher_icons: ^0.13.1
 
 dev_dependencies:
   flutter_test:
@@ -20,3 +21,8 @@ flutter:
   uses-material-design: true
   assets:
   - assets/microfone.png
+  - assets/sinal.png
+
+flutter_icons:
+  android: true
+  ios: true

@@ -27,6 +27,7 @@ flutter:
   - assets/espera.mp3
   - assets/sinalverde.mp3
   - assets/sinalvermelho.mp3
+  - assets/toque.mp3
 
 flutter_icons:
   android: true

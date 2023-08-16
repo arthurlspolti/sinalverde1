@@ -23,6 +23,10 @@ flutter:
   - assets/microfone.png
   - assets/sinal.png
   - assets/apr.mp3
+  - assets/cnx.mp3
+  - assets/espera.mp3
+  - assets/sinalverde.mp3
+  - assets/sinalvermelho.mp3
 
 flutter_icons:
   android: true

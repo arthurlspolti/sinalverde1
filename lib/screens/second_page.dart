@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class SecondPage extends StatefulWidget {
   @override
@@ -7,12 +8,19 @@ class SecondPage extends StatefulWidget {
 }
 
 class _SecondPageState extends State<SecondPage> {
+  AudioPlayer _audioPlayer = AudioPlayer();
   Color _circleColor = Colors.green;
   Timer? _timer;
 
   @override
   void initState() {
     super.initState();
+    _playAudio();
+  }
+
+  Future<void> _playAudio() async {
+    await _audioPlayer.play(AssetSource('toque.mp3'));
+    await _audioPlayer.setVolume(1);
   }
 
   void _startTimer() {
@@ -36,6 +44,7 @@ class _SecondPageState extends State<SecondPage> {
 
   @override
   void dispose() {
+    _audioPlayer.dispose();
     _timer?.cancel();
     super.dispose();
   }

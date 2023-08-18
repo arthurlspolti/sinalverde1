@@ -15,11 +15,12 @@ class _SecondPageState extends State<SecondPage> {
   @override
   void initState() {
     super.initState();
-    _playAudio();
+    _playAudio('toque.mp3');
   }
 
-  Future<void> _playAudio() async {
-    await _audioPlayer.play(AssetSource('toque.mp3'));
+  Future<void> _playAudio(String assetPath) async {
+    await _audioPlayer.stop(); // Para parar a reprodução anterior
+    await _audioPlayer.play(AssetSource(assetPath));
     await _audioPlayer.setVolume(1);
   }
 
@@ -31,6 +32,7 @@ class _SecondPageState extends State<SecondPage> {
     _timer = Timer(Duration(seconds: 5), () {
       setState(() {
         _circleColor = Colors.red;
+        _playAudio('sinalvermelho.mp3'); // Parar a reprodução do áudio quando o semáforo fica vermelho
       });
     });
   }
@@ -38,6 +40,7 @@ class _SecondPageState extends State<SecondPage> {
   void _simulateArduinoSignal() {
     setState(() {
       _circleColor = Colors.green;
+      _playAudio('sinalverde.mp3'); // Reproduzir áudio de sinal verde
       _startTimer();
     });
   }

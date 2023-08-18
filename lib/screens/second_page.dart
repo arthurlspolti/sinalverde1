@@ -1,5 +1,5 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
 
 class SecondPage extends StatefulWidget {
   @override
@@ -7,22 +7,36 @@ class SecondPage extends StatefulWidget {
 }
 
 class _SecondPageState extends State<SecondPage> {
-  AudioPlayer _audioPlayer = AudioPlayer();
+  Color _circleColor = Colors.green;
+  Timer? _timer;
 
   @override
   void initState() {
     super.initState();
-    _playAudio();
   }
 
-  Future<void> _playAudio() async {
-    await _audioPlayer.play(AssetSource('toque.mp3'));
-    await _audioPlayer.setVolume(1);
+  void _startTimer() {
+    if (_timer != null && _timer!.isActive) {
+      _timer!.cancel();
+    }
+
+    _timer = Timer(Duration(seconds: 5), () {
+      setState(() {
+        _circleColor = Colors.red;
+      });
+    });
+  }
+
+  void _simulateArduinoSignal() {
+    setState(() {
+      _circleColor = Colors.green;
+      _startTimer();
+    });
   }
 
   @override
   void dispose() {
-    _audioPlayer.dispose();
+    _timer?.cancel();
     super.dispose();
   }
 
@@ -43,36 +57,26 @@ class _SecondPageState extends State<SecondPage> {
                 width: MediaQuery.of(context).size.width * 0.3,
                 height: MediaQuery.of(context).size.width * 0.3,
                 decoration: BoxDecoration(
-                  color: Colors.red,
+                  color: _circleColor,
                   shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Text(
+                    _circleColor == Colors.green ? 'Avançar' : 'Parar',
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.white,
+                      fontFamily: 'verdana',
+                    ),
+                  ),
                 ),
               ),
               SizedBox(height: 20),
-              Text(
-                'Parar',
-                style: TextStyle(
-                  fontSize: 30,
-                  color: Colors.white,
-                  fontFamily: 'verdana',
-                ),
-              ),
-              SizedBox(height: 40),
-              Container(
-                width: MediaQuery.of(context).size.width * 0.3,
-                height: MediaQuery.of(context).size.width * 0.3,
-                decoration: BoxDecoration(
-                  color: Colors.green,
-                  shape: BoxShape.circle,
-                ),
-              ),
-              SizedBox(height: 20),
-              Text(
-                'Avançar',
-                style: TextStyle(
-                  fontSize: 30,
-                  color: Colors.white,
-                  fontFamily: 'verdana',
-                ),
+              ElevatedButton(
+                onPressed: () {
+                  _simulateArduinoSignal();
+                },
+                child: Text('Simular Sinal Arduino'),
               ),
             ],
           ),

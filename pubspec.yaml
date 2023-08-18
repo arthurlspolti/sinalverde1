@@ -28,6 +28,7 @@ flutter:
   - assets/sinalverde.mp3
   - assets/sinalvermelho.mp3
   - assets/toque.mp3
+  - assets/arrow.png
 
 flutter_icons:
   android: true

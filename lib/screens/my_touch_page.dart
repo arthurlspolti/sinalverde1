@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'second_page.dart';
 
@@ -9,7 +8,7 @@ class MyTouchPage extends StatefulWidget {
 }
 
 class _MyTouchPageState extends State<MyTouchPage> {
-  bool _isButtonDisabled = true;
+  bool _isButtonEnabled = false;
 
   @override
   void initState() {
@@ -17,36 +16,41 @@ class _MyTouchPageState extends State<MyTouchPage> {
 
     Timer(Duration(seconds: 8), () {
       setState(() {
-        _isButtonDisabled = false;
+        _isButtonEnabled = true;
       });
     });
+  }
+
+  void _navigateToSecondPage() {
+    if (_isButtonEnabled) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => SecondPage()),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xFF247BA0),
-      body: Center(
-        child: GestureDetector(
-          onTap: _isButtonDisabled
-              ? null
-              : () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => SecondPage()),
-                  );
-                },
-          child: Semantics(
-            label: "Avançar para a próxima página",
-            child: Container(
-              width: double.infinity,
-              height: double.infinity,
-              child: Icon(
-                Icons.arrow_forward,
-                color: Colors.white,
-                size: 120000,
+      body: GestureDetector(
+        onTap: _navigateToSecondPage,
+        child: Center(
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage("assets/arrow.png"),
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
         ),
       ),

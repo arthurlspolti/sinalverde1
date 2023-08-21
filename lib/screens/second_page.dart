@@ -60,7 +60,6 @@ class _SecondPageState extends State<SecondPage> {
       if (isConnected) {
         setState(() {
           _circleColor = Colors.green;
-          _startTimer();
           _playAudio('toque.mp3');
         });
       } else {
@@ -77,18 +76,6 @@ class _SecondPageState extends State<SecondPage> {
     await _audioPlayer.setVolume(1);
   }
 
-  void _startTimer() {
-    if (_timer != null && _timer!.isActive) {
-      _timer!.cancel();
-    }
-
-    _timer = Timer(Duration(seconds: 5), () {
-      setState(() {
-        _circleColor = Colors.red;
-        _playAudio('sinalvermelho.mp3'); // Play 'sinalvermelho.mp3'
-      });
-    });
-  }
 
   @override
   void dispose() {

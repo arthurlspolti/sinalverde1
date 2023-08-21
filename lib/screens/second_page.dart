@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:wifi_iot/wifi_iot.dart';
 
 class SecondPage extends StatefulWidget {
   @override
@@ -15,11 +16,44 @@ class _SecondPageState extends State<SecondPage> {
   @override
   void initState() {
     super.initState();
-    _playAudio('toque.mp3');
+    _initWifi();
+  }
+
+  Future<void> _initWifi() async {
+    if (!await WiFiForIoTPlugin.isConnected()) {
+      bool isWifiEnabled = await WiFiForIoTPlugin.isEnabled();
+      if (!isWifiEnabled) {
+        await WiFiForIoTPlugin.setEnabled(true);
+      }
+      await _connectToWifi();
+    }
+  }
+
+  Future<void> _connectToWifi() async {
+    try {
+      // Connect to Wi-Fi network
+      bool isConnected = await WiFiForIoTPlugin.connect(
+        'Semaforo',
+        password: '12345678',
+        security: NetworkSecurity.WPA,
+      );
+
+      if (isConnected) {
+        setState(() {
+          _circleColor = Colors.green;
+          _startTimer();
+          _playAudio('toque.mp3');
+        });
+      } else {
+        print('Failed to connect to Wi-Fi');
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
   }
 
   Future<void> _playAudio(String assetPath) async {
-    await _audioPlayer.stop(); // Para parar a reprodução anterior
+    await _audioPlayer.stop(); // Stop previous playback
     await _audioPlayer.play(AssetSource(assetPath));
     await _audioPlayer.setVolume(1);
   }
@@ -32,16 +66,8 @@ class _SecondPageState extends State<SecondPage> {
     _timer = Timer(Duration(seconds: 5), () {
       setState(() {
         _circleColor = Colors.red;
-        _playAudio('sinalvermelho.mp3'); // Parar a reprodução do áudio quando o semáforo fica vermelho
+        _playAudio('sinalvermelho.mp3'); // Play 'sinalvermelho.mp3'
       });
-    });
-  }
-
-  void _simulateArduinoSignal() {
-    setState(() {
-      _circleColor = Colors.green;
-      _playAudio('sinalverde.mp3'); // Reproduzir áudio de sinal verde
-      _startTimer();
     });
   }
 
@@ -74,7 +100,7 @@ class _SecondPageState extends State<SecondPage> {
                 ),
                 child: Center(
                   child: Text(
-                    _circleColor == Colors.green ? 'Avançar' : 'Parar',
+                    _circleColor == Colors.green ? 'Avançar' : 'Parar2',
                     style: TextStyle(
                       fontSize: 20,
                       color: Colors.white,
@@ -95,6 +121,10 @@ class _SecondPageState extends State<SecondPage> {
         ),
       ),
     );
+  }
+
+  void _simulateArduinoSignal() async {
+    await _initWifi();
   }
 }
 

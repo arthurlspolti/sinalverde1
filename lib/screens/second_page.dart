@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:wifi_iot/wifi_iot.dart';
+import 'package:http/http.dart' as http;
 
 class SecondPage extends StatefulWidget {
   @override
@@ -17,6 +18,24 @@ class _SecondPageState extends State<SecondPage> {
   void initState() {
     super.initState();
     _initWifi();
+  }
+
+  String semaforoStatus = 'Carregando...';
+
+  Future<void> fetchSemaforoStatus() async {
+    final response = await http.get(Uri.parse('http://192.168.4.1/status'));
+
+    if (response.statusCode == 200) {
+      setState(() {
+         _circleColor = Colors.red;
+        _playAudio('sinalvermelho.mp3');
+      });
+    } else if (response.statusCode == 100) {
+      setState(() {
+        _circleColor = Colors.green;
+        _playAudio('sinalverde.mp3');
+      });
+    }
   }
 
   Future<void> _initWifi() async {

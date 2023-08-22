@@ -15,11 +15,14 @@ class _SecondPageState extends State<SecondPage> {
   AudioPlayer _audioPlayer = AudioPlayer();
   Timer? _timer;
 
+  String _previousWebsiteData = ''; // Para acompanhar o status anterior
+  bool _audioPlayed = false; // Para controlar se o áudio foi tocado
+
   @override
   void initState() {
     super.initState();
     _initWifi();
-    Timer.periodic(Duration(seconds: 1), (timer) {
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
       fetchDataFromWebsite();
     });
   }
@@ -32,14 +35,23 @@ class _SecondPageState extends State<SecondPage> {
       if (response.statusCode == 200) {
         setState(() {
           websiteData = response.body;
-          if (websiteData == 'Sinal Verde') {
-            _circleColor = Colors.green;
-            _playAudio('sinalverde.mp3');
-            // Execute actions for 'Sinal Verde'
-          } else if (websiteData == 'Sinal Vermelho') {
-            _circleColor = Colors.red;
-            _playAudio('sinalvermelho.mp3');
-            // Execute actions for 'Sinal Vermelho'
+          if (websiteData != _previousWebsiteData) {
+            // Apenas quando há uma mudança de status
+            _previousWebsiteData = websiteData;
+            _audioPlayed = false; // Reset do controle de áudio
+          }
+
+          if (!_audioPlayed) {
+            if (websiteData == 'Sinal Verde') {
+              _circleColor = Colors.green;
+              _playAudio('sinalverde.mp3');
+              // Execute actions for 'Sinal Verde'
+            } else if (websiteData == 'Sinal Vermelho') {
+              _circleColor = Colors.red;
+              _playAudio('sinalvermelho.mp3');
+              // Execute actions for 'Sinal Vermelho'
+            }
+            _audioPlayed = true; // Áudio tocado
           }
         });
       } else {
@@ -83,7 +95,6 @@ class _SecondPageState extends State<SecondPage> {
     await _audioPlayer.play(AssetSource(assetPath));
     await _audioPlayer.setVolume(1);
   }
-
 
   @override
   void dispose() {

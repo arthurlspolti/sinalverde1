@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:wifi_iot/wifi_iot.dart';
+import 'dart:async';
 
 void main() {
   runApp(MyApp());
@@ -30,6 +31,10 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     _initWifi();
+    // Inicia um Timer que chama fetchDataFromWebsite a cada 10 segundos.
+    Timer.periodic(Duration(seconds: 10), (timer) {
+      fetchDataFromWebsite();
+    });
     super.initState();
   }
 
@@ -61,7 +66,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  Future<void> fetchDataFromWebsite() async {
+   Future<void> fetchDataFromWebsite() async {
     try {
       final response = await http.get(Uri.parse("http://192.168.4.1/status"));
       if (response.statusCode == 200) {
@@ -86,13 +91,6 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            ElevatedButton(
-              onPressed: () {
-                fetchDataFromWebsite();
-              },
-              child: Text("Fetch Data from Website"),
-            ),
-            SizedBox(height: 20),
             Text("Website Data:"),
             SizedBox(height: 10),
             Expanded(

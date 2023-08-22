@@ -27,6 +27,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   String websiteData = "No data";
+  Color _circleColor = Colors.grey;
 
   @override
   void initState() {
@@ -66,12 +67,19 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-   Future<void> fetchDataFromWebsite() async {
+  Future<void> fetchDataFromWebsite() async {
     try {
       final response = await http.get(Uri.parse("http://192.168.4.1/status"));
       if (response.statusCode == 200) {
         setState(() {
           websiteData = response.body;
+          if (websiteData == 'Sinal Verde') {
+            _circleColor = Colors.green;
+            // Execute actions for 'Sinal Verde'
+          } else if (websiteData == 'Sinal Vermelho') {
+            _circleColor = Colors.red;
+            // Execute actions for 'Sinal Vermelho'
+          }
         });
       } else {
         print("Failed to fetch data from website");
@@ -85,22 +93,18 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Wi-Fi and HTTP Example"),
+        title: Text('Wi-Fi Connection Example'),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text("Website Data:"),
-            SizedBox(height: 10),
-            Expanded(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(websiteData),
-                ),
-              ),
+          children: [
+            CircleAvatar(
+              radius: 50.0,
+              backgroundColor: _circleColor,
             ),
+            SizedBox(height: 20),
+            Text('Status do Semáforo: $websiteData'),
           ],
         ),
       ),

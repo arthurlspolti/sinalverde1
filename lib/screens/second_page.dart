@@ -10,31 +10,43 @@ class SecondPage extends StatefulWidget {
 }
 
 class _SecondPageState extends State<SecondPage> {
+  String websiteData = "No data";
+  Color _circleColor = Colors.grey;
   AudioPlayer _audioPlayer = AudioPlayer();
-  Color _circleColor = Colors.green;
   Timer? _timer;
 
   @override
   void initState() {
     super.initState();
     _initWifi();
+    Timer.periodic(Duration(seconds: 1), (timer) {
+      fetchDataFromWebsite();
+    });
   }
 
   String semaforoStatus = 'Carregando...';
 
-  Future<void> fetchSemaforoStatus() async {
-    final response = await http.get(Uri.parse('http://192.168.4.1/status'));
-
-    if (response.statusCode == 200) {
-      setState(() {
-         _circleColor = Colors.red;
-        _playAudio('sinalvermelho.mp3');
-      });
-    } else if (response.statusCode == 100) {
-      setState(() {
-        _circleColor = Colors.green;
-        _playAudio('sinalverde.mp3');
-      });
+  Future<void> fetchDataFromWebsite() async {
+    try {
+      final response = await http.get(Uri.parse("http://192.168.4.1/status"));
+      if (response.statusCode == 200) {
+        setState(() {
+          websiteData = response.body;
+          if (websiteData == 'Sinal Verde') {
+            _circleColor = Colors.green;
+            _playAudio('sinalverde.mp3');
+            // Execute actions for 'Sinal Verde'
+          } else if (websiteData == 'Sinal Vermelho') {
+            _circleColor = Colors.red;
+            _playAudio('sinalvermelho.mp3');
+            // Execute actions for 'Sinal Vermelho'
+          }
+        });
+      } else {
+        print("Failed to fetch data from website");
+      }
+    } catch (e) {
+      print("Error fetching data: $e");
     }
   }
 
@@ -56,17 +68,13 @@ class _SecondPageState extends State<SecondPage> {
         password: '12345678',
         security: NetworkSecurity.WPA,
       );
-
       if (isConnected) {
-        setState(() {
-          _circleColor = Colors.green;
-          _playAudio('toque.mp3');
-        });
+        print("Connected to Wi-Fi");
       } else {
-        print('Failed to connect to Wi-Fi');
+        print("Failed to connect to Wi-Fi");
       }
     } catch (e) {
-      print('Error: $e');
+      print("Error connecting to Wi-Fi: $e");
     }
   }
 
@@ -106,7 +114,7 @@ class _SecondPageState extends State<SecondPage> {
                 ),
                 child: Center(
                   child: Text(
-                    _circleColor == Colors.green ? 'Avançar' : 'Parar2',
+                    _circleColor == Colors.green ? 'Avançar' : 'Parar',
                     style: TextStyle(
                       fontSize: 20,
                       color: Colors.white,
@@ -116,24 +124,10 @@ class _SecondPageState extends State<SecondPage> {
                 ),
               ),
               SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  _simulateArduinoSignal();
-                },
-                child: Text('Simular Sinal Arduino'),
-              ),
             ],
           ),
         ),
       ),
     );
   }
-
-  void _simulateArduinoSignal() async {
-    await _initWifi();
-  }
-}
-
-void main() {
-  runApp(MaterialApp(home: SecondPage()));
 }

@@ -11,7 +11,7 @@ class SecondPage extends StatefulWidget {
 
 class _SecondPageState extends State<SecondPage> {
   String websiteData = "No data";
-  Color _circleColor = Colors.grey;
+  Color _circleColor = Colors.white54;
   AudioPlayer _audioPlayer = AudioPlayer();
   Timer? _timer;
 
@@ -50,6 +50,10 @@ class _SecondPageState extends State<SecondPage> {
               _circleColor = Colors.red;
               _playAudio('sinalvermelho.mp3');
               // Execute actions for 'Sinal Vermelho'
+            }
+            if (websiteData == 'Sinal Piscando') {
+              _circleColor = Colors.grey;
+              _playAudio('espera.mp3');
             }
             _audioPlayed = true; // Áudio tocado
           }
@@ -125,7 +129,7 @@ class _SecondPageState extends State<SecondPage> {
                 ),
                 child: Center(
                   child: Text(
-                    _circleColor == Colors.green ? 'Avançar' : 'Parar',
+                    _circleColor == Colors.green ? 'Avançar' : _circleColor == Colors.red ? 'Parar' : _circleColor == Colors.grey ? 'Piscando' : 'Desconectado',
                     style: TextStyle(
                       fontSize: 20,
                       color: Colors.white,

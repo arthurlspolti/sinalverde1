@@ -1,187 +1,100 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-
-import 'package:audioplayers/audioplayers.dart';
-
-import 'package:network_info_plus/network_info_plus.dart';
-
+import 'package:wifi_iot/wifi_iot.dart';
 import 'package:http/http.dart' as http;
 
-import 'package:connectivity/connectivity.dart';
+void main() {
+  runApp(SecondPage());
+}
 
-import 'package:wifi_iot/wifi_iot.dart';
 
 class SecondPage extends StatefulWidget {
   @override
-  _SecondPageState createState() => _SecondPageState();
+  _SecondPage createState() => _SecondPage();
 }
 
-class _SecondPageState extends State<SecondPage> {
-  String websiteData = "No data";
-
-  Color _circleColor = Colors.white54;
-
-  AudioPlayer _audioPlayer = AudioPlayer();
-
-  Timer? _timer;
-
-  String _previousWebsiteData = '';
-
-  bool _audioPlayed = false;
+class _SecondPage extends State<SecondPage> {
+  Color _circleColor = Colors.grey;
+  String _semaforoStatus = 'Carregando...';
 
   @override
   void initState() {
     super.initState();
-
-    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-      fetchDataFromWebsite();
-    });
-
     _connectToWifi();
-  }
-
-  Future<void> fetchDataFromWebsite() async {
-    try {
-      final response = await http.get(Uri.parse("http://192.168.4.1/status"));
-
-      if (response.statusCode == 200) {
-        setState(() {
-          websiteData = response.body;
-
-          if (websiteData != _previousWebsiteData) {
-            _previousWebsiteData = websiteData;
-
-            _audioPlayed = false;
-          }
-
-          if (!_audioPlayed) {
-            if (websiteData == 'Sinal Verde') {
-              _circleColor = Colors.green;
-
-              _playAudio('sinalverde.mp3');
-            } else if (websiteData == 'Sinal Vermelho') {
-              _circleColor = Colors.red;
-
-              _playAudio('sinalvermelho.mp3');
-            }
-
-            if (websiteData == 'Sinal Piscando') {
-              _circleColor = Colors.grey;
-
-              _playAudio('espera.mp3');
-            }
-
-            _audioPlayed = true;
-          }
-        });
-      } else {
-        print("Failed to fetch data from website");
-      }
-    } catch (e) {
-      print("Error fetching data: $e");
-    }
+    _startCheckingStatusLoop();
   }
 
   Future<void> _connectToWifi() async {
     try {
-      List<String> availableNetworks = ['semaforo2', 'semaforo1'];
+      // Connect to Wi-Fi network
+      bool isConnected = await WiFiForIoTPlugin.connect(
+        'Semaforo',
+        password: '12345678',
+        security: NetworkSecurity.WPA,
+      );
 
-      String nearestNetwork = '';
-
-      NetworkInfo networkInfo = NetworkInfo();
-
-      ConnectivityResult connectivityResult =
-          await Connectivity().checkConnectivity();
-
-      if (connectivityResult == ConnectivityResult.wifi) {
-        nearestNetwork = await networkInfo.getWifiName() ?? '';
-      }
-
-      if (nearestNetwork.isNotEmpty &&
-          availableNetworks.contains(nearestNetwork)) {
-        print("Already connected to the nearest Wi-Fi: $nearestNetwork");
-
-        return;
-      }
-
-      for (String network in availableNetworks) {
-        bool isConnected = await WiFiForIoTPlugin.connect(
-          network,
-          password: '12345678',
-          security: NetworkSecurity.WPA,
-        );
-
-        if (isConnected) {
-          print("Connected to Wi-Fi: $network");
-
-          break; // Sair do loop se conectado a uma rede
-        } else {
-          print("Failed to connect to Wi-Fi: $network");
-        }
+      if (isConnected) {
+        // Do something after successful connection
+      } else {
+        print('Failed to connect to Wi-Fi');
       }
     } catch (e) {
-      print("Error connecting to Wi-Fi: $e");
+      print('Error: $e');
     }
   }
 
-  Future<void> _playAudio(String assetPath) async {
-    await _audioPlayer.stop();
-
-    await _audioPlayer.play(AssetSource(assetPath));
-
-    await _audioPlayer.setVolume(1);
+  Future<void> _startCheckingStatusLoop() async {
+    while (true) {
+      await fetchSemaforoStatus();
+      await Future.delayed(Duration(milliseconds: 100));
+    }
   }
 
-  @override
-  void dispose() {
-    _audioPlayer.dispose();
+  Future<void> fetchSemaforoStatus() async {
+  try {
+    final response = await http.get(Uri.parse('http://192.168.4.1/status'));
 
-    _timer?.cancel();
+    if (response.statusCode == 200) {
+      setState(() {
+        _semaforoStatus = response.body;
+      });
 
-    super.dispose();
+      if (_semaforoStatus == 'Sinal Verde') {
+        setState(() {
+          _circleColor = Colors.green;
+          // Execute actions for 'Sinal Verde'
+        });
+      } else if (_semaforoStatus == 'Sinal Vermelho') {
+        setState(() {
+          _circleColor = Colors.red;
+          // Execute actions for 'Sinal Vermelho'
+        });
+      }
+    } else {
+      print('Failed to fetch semáforo status');
+    }
+  } catch (e) {
+    print('Error fetching semáforo status: $e');
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF247BA0),
       appBar: AppBar(
-        backgroundColor: Color(0xFF13293D),
+        title: Text('Wi-Fi Connection Example'),
       ),
-      body: SafeArea(
-        top: true,
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: MediaQuery.of(context).size.width * 0.3,
-                height: MediaQuery.of(context).size.width * 0.3,
-                decoration: BoxDecoration(
-                  color: _circleColor,
-                  shape: BoxShape.circle,
-                ),
-                child: Center(
-                  child: Text(
-                    _circleColor == Colors.green
-                        ? 'Avançar'
-                        : _circleColor == Colors.red
-                            ? 'Parar'
-                            : _circleColor == Colors.grey
-                                ? 'Piscando'
-                                : 'Desconectado',
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: Colors.white,
-                      fontFamily: 'verdana',
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
-            ],
-          ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircleAvatar(
+              radius: 50.0,
+              backgroundColor: _circleColor,
+            ),
+            SizedBox(height: 20),
+            Text('Status do Semáforo: $_semaforoStatus'),
+          ],
         ),
       ),
     );

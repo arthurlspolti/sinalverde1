@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
 import 'package:wifi_iot/wifi_iot.dart';
 import 'package:http/http.dart' as http;
 
@@ -12,22 +11,18 @@ class SecondPage extends StatefulWidget {
 class _SecondPageState extends State<SecondPage> {
   String websiteData = "No data";
   Color _circleColor = Colors.white54;
-  AudioPlayer _audioPlayer = AudioPlayer();
   Timer? _timer;
 
-  String _previousWebsiteData = ''; // Para acompanhar o status anterior
-  bool _audioPlayed = false; // Para controlar se o áudio foi tocado
+  String _previousWebsiteData = '';
 
   @override
   void initState() {
     super.initState();
-    _initWifi();
+    _connectToStrongestWifi();
     _timer = Timer.periodic(Duration(seconds: 1), (timer) {
       fetchDataFromWebsite();
     });
   }
-
-  String semaforoStatus = 'Carregando...';
 
   Future<void> fetchDataFromWebsite() async {
     try {
@@ -36,26 +31,17 @@ class _SecondPageState extends State<SecondPage> {
         setState(() {
           websiteData = response.body;
           if (websiteData != _previousWebsiteData) {
-            // Apenas quando há uma mudança de status
             _previousWebsiteData = websiteData;
-            _audioPlayed = false; // Reset do controle de áudio
           }
 
-          if (!_audioPlayed) {
-            if (websiteData == 'Sinal Verde') {
-              _circleColor = Colors.green;
-              _playAudio('sinalverde.mp3');
-              // Execute actions for 'Sinal Verde'
-            } else if (websiteData == 'Sinal Vermelho') {
-              _circleColor = Colors.red;
-              _playAudio('sinalvermelho.mp3');
-              // Execute actions for 'Sinal Vermelho'
-            }
-            if (websiteData == 'Sinal Piscando') {
-              _circleColor = Colors.grey;
-              _playAudio('espera.mp3');
-            }
-            _audioPlayed = true; // Áudio tocado
+          if (websiteData == 'Sinal Verde') {
+            _circleColor = Colors.green;
+          } else if (websiteData == 'Sinal Vermelho') {
+            _circleColor = Colors.red;
+          } else if (websiteData == 'Sinal Piscando') {
+            _circleColor = Colors.grey;
+          } else {
+            _circleColor = Colors.white54;
           }
         });
       } else {
@@ -66,43 +52,20 @@ class _SecondPageState extends State<SecondPage> {
     }
   }
 
-  Future<void> _initWifi() async {
-    if (!await WiFiForIoTPlugin.isConnected()) {
-      bool isWifiEnabled = await WiFiForIoTPlugin.isEnabled();
-      if (!isWifiEnabled) {
-        await WiFiForIoTPlugin.setEnabled(true);
-      }
-      await _connectToWifi();
-    }
-  }
-
-  Future<void> _connectToWifi() async {
+  Future<void> _connectToStrongestWifi() async {
     try {
-      // Connect to Wi-Fi network
-      bool isConnected = await WiFiForIoTPlugin.connect(
-        'Semaforo',
-        password: '12345678',
-        security: NetworkSecurity.WPA,
-      );
-      if (isConnected) {
-        print("Connected to Wi-Fi");
-      } else {
-        print("Failed to connect to Wi-Fi");
-      }
+      List<WifiNetwork> networks = await WiFiForIoTPlugin.loadWifiList();
+      List<WifiNetwork> filteredNetworks = networks.where((network) => network.ssid == 'semaforo1' || network.ssid == 'semaforo2').toList();
+      filteredNetworks.sort((a, b) => b.level?.compareTo(a.level ?? 0) ?? 0);
+      WifiNetwork strongestNetwork = filteredNetworks.first;
+      await WiFiForIoTPlugin.connect(strongestNetwork.ssid!, password: '12345678', security: NetworkSecurity.WPA);
     } catch (e) {
       print("Error connecting to Wi-Fi: $e");
     }
   }
 
-  Future<void> _playAudio(String assetPath) async {
-    await _audioPlayer.stop(); // Stop previous playback
-    await _audioPlayer.play(AssetSource(assetPath));
-    await _audioPlayer.setVolume(1);
-  }
-
   @override
   void dispose() {
-    _audioPlayer.dispose();
     _timer?.cancel();
     super.dispose();
   }

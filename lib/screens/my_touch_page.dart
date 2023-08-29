@@ -27,7 +27,7 @@ class _MyTouchPageState extends State<MyTouchPage> {
     if (_isButtonEnabled) {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const SecondPage()),
+        MaterialPageRoute(builder: (context) => SecondPage()),
       );
     }
   }

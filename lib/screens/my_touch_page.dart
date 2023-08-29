@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'second_page.dart';
 
 class MyTouchPage extends StatefulWidget {
+  const MyTouchPage({super.key});
+
   @override
   _MyTouchPageState createState() => _MyTouchPageState();
 }
@@ -14,7 +16,7 @@ class _MyTouchPageState extends State<MyTouchPage> {
   void initState() {
     super.initState();
 
-    Timer(Duration(seconds: 8), () {
+    Timer(const Duration(seconds: 8), () {
       setState(() {
         _isButtonEnabled = true;
       });
@@ -25,7 +27,7 @@ class _MyTouchPageState extends State<MyTouchPage> {
     if (_isButtonEnabled) {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => SecondPage()),
+        MaterialPageRoute(builder: (context) => const SecondPage()),
       );
     }
   }
@@ -33,7 +35,7 @@ class _MyTouchPageState extends State<MyTouchPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF247BA0),
+      backgroundColor: const Color(0xFF247BA0),
       body: GestureDetector(
         onTap: _navigateToSecondPage,
         child: Center(
@@ -42,7 +44,7 @@ class _MyTouchPageState extends State<MyTouchPage> {
             children: [
               Positioned.fill(
                 child: Container(
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     image: DecorationImage(
                       image: AssetImage("assets/arrow.png"),
                       fit: BoxFit.contain,

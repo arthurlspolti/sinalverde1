@@ -27,13 +27,13 @@ class _LoadingScreenState extends State<LoadingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF247BA0),
+      backgroundColor: const Color(0xFF247BA0),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             AnimatedHourglassIcon(),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             // Other widgets
           ],
         ),

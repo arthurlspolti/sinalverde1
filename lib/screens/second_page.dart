@@ -3,11 +3,13 @@ import 'package:wifi_iot/wifi_iot.dart';
 import 'package:http/http.dart' as http;
 
 void main() {
-  runApp(SecondPage());
+  runApp(const SecondPage());
 }
 
 
 class SecondPage extends StatefulWidget {
+  const SecondPage({super.key});
+
   @override
   _SecondPage createState() => _SecondPage();
 }
@@ -27,7 +29,7 @@ class _SecondPage extends State<SecondPage> {
     try {
       // Connect to Wi-Fi network
       bool isConnected = await WiFiForIoTPlugin.connect(
-        'Semaforo',
+        'Semaforo1',
         password: '12345678',
         security: NetworkSecurity.WPA,
       );
@@ -45,7 +47,7 @@ class _SecondPage extends State<SecondPage> {
   Future<void> _startCheckingStatusLoop() async {
     while (true) {
       await fetchSemaforoStatus();
-      await Future.delayed(Duration(milliseconds: 100));
+      await Future.delayed(const Duration(milliseconds: 100));
     }
   }
 
@@ -82,7 +84,7 @@ class _SecondPage extends State<SecondPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Wi-Fi Connection Example'),
+        title: const Text('Wi-Fi Connection Example'),
       ),
       body: Center(
         child: Column(
@@ -92,7 +94,7 @@ class _SecondPage extends State<SecondPage> {
               radius: 50.0,
               backgroundColor: _circleColor,
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Text('Status do Semáforo: $_semaforoStatus'),
           ],
         ),

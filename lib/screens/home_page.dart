@@ -4,12 +4,14 @@ import 'my_touch_page.dart';
 import 'package:audioplayers/audioplayers.dart';
 
 class HomePageWidget extends StatefulWidget {
+  const HomePageWidget({super.key});
+
   @override
   _HomePageWidgetState createState() => _HomePageWidgetState();
 }
 
 class _HomePageWidgetState extends State<HomePageWidget> {
-  AudioPlayer _audioPlayer = AudioPlayer();
+  final AudioPlayer _audioPlayer = AudioPlayer();
 
   @override
   void initState() {
@@ -33,15 +35,15 @@ class _HomePageWidgetState extends State<HomePageWidget> {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => MyTouchPage()),
+          MaterialPageRoute(builder: (context) => const MyTouchPage()),
         );
       },
       child: Scaffold(
-        backgroundColor: Color(0xFF247BA0),
+        backgroundColor: const Color(0xFF247BA0),
         appBar: AppBar(
-          backgroundColor: Color(0xFF13293D),
+          backgroundColor: const Color(0xFF13293D),
           automaticallyImplyLeading: false,
-          title: Text(
+          title: const Text(
             'Sinal verde',
             style: TextStyle(
               fontFamily: 'Outfit',

@@ -20,33 +20,32 @@ class _SecondPageState extends State<SecondPage> {
     _connectToStrongestWifi();
   }
 
-     Future<void> _connectToStrongestWifi() async {
-     try {
-       // Load the list of available Wi-Fi networks
-       List<WifiNetwork> networks = await WiFiForIoTPlugin.loadWifiList();
+Future<void> _connectToStrongestWifi() async {
+  try {
+    List<WifiNetwork> networks = await WiFiForIoTPlugin.loadWifiList();
+    
+    WifiNetwork? strongestNetwork;
+    int strongestSignalLevel = -1000; // Initialize with a very low signal level
+    
+    for (WifiNetwork network in networks) {
+      if (network.ssid == 'semaforo1' || network.ssid == 'semaforo2') {
+        if (network.level != null && network.level! > strongestSignalLevel) {
+          strongestNetwork = network;
+          strongestSignalLevel = network.level!;
+        }
+      }
+    }
+    
+    if (strongestNetwork != null) {
+      await connectToWifi(strongestNetwork.ssid!, password: '12345678', security: NetworkSecurity.WPA);
+    } else {
+      print("No matching Wi-Fi networks found.");
+    }
+  } catch (e) {
+    print("Error connecting to Wi-Fi: $e");
+  }
+}
 
-       // Filter the networks to include only 'semaforo1' and 'semaforo2'
-       List<WifiNetwork> filteredNetworks = networks
-           .where((network) => network.ssid == 'semaforo1' || network.ssid == 'semaforo2')
-           .toList();
-
-       // Sort the filtered networks based on the signal level
-       filteredNetworks.sort((a, b) =>
-           b.level!.compareTo(a.level!)); // Changed to non-null assertions for clarity
-
-       // Connect to the strongest network
-       WifiNetwork strongestNetwork = filteredNetworks.first;
-       await connectToWifi(strongestNetwork.ssid!, password: '12345678',
-           security: NetworkSecurity.WPA);
-
-       // Set up a timer to periodically fetch data from the website
-       _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-         fetchDataFromWebsite();
-       });
-     } catch (e) {
-       print("Error connecting to Wi-Fi: $e");
-     }
-   }
 
 
   Future<void> connectToWifi(String ssid, {String? password, NetworkSecurity security = NetworkSecurity.WPA}) async {

@@ -13,7 +13,11 @@ dependencies:
   flutter_launcher_icons: ^0.13.1
   wifi_iot: ^0.3.18
   http: ^0.13.3
+<<<<<<< Updated upstream
   permission_handler: ^10.4.3
+=======
+  wifi_scan: ^0.4.0+1
+>>>>>>> Stashed changes
 
 dev_dependencies:
   flutter_test:

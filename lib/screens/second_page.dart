@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:wifi_iot/wifi_iot.dart';
+import 'package:wifi_scan/wifi_scan.dart';
 import 'package:http/http.dart' as http;
+
 
 class SecondPage extends StatefulWidget {
   @override
@@ -18,10 +20,41 @@ class _SecondPageState extends State<SecondPage> {
   @override
   void initState() {
     super.initState();
+    
     _connectToStrongestWifi();
+<<<<<<< Updated upstream
     _timer = Timer.periodic(Duration(seconds: 1), (timer) {
       fetchDataFromWebsite();
     });
+=======
+  }
+
+Future<void> _connectToStrongestWifi() async {
+  try {
+    List<WifiNetwork> networks = await WiFiForIoTPlugin.loadWifiList();
+    List<WifiNetwork> filteredNetworks = networks.where((network) => network.ssid == 'semaforo1' || network.ssid == 'semaforo2').toList();
+    filteredNetworks.sort((a, b) => b.level?.compareTo(a.level ?? 0) ?? 0);
+    WifiNetwork strongestNetwork = filteredNetworks.first;
+    await connectToWifi(strongestNetwork.ssid!, password: '12345678', security: NetworkSecurity.WPA);
+    
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      fetchDataFromWebsite();
+    });
+  } catch (e) {
+    print("Error connecting to Wi-Fi: $e");
+  }
+}
+
+
+
+  Future<void> connectToWifi(String ssid, {String? password, NetworkSecurity security = NetworkSecurity.WPA}) async {
+    try {
+      await WiFiForIoTPlugin.disconnect();
+      await WiFiForIoTPlugin.connect(ssid, password: password, security: security);
+    } catch (e) {
+      print("Error connecting to Wi-Fi: $e");
+    }
+>>>>>>> Stashed changes
   }
 
   Future<void> fetchDataFromWebsite() async {

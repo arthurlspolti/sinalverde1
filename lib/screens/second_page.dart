@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:wifi_iot/wifi_iot.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter/services.dart';
 
 class SecondPage extends StatefulWidget {
   @override
@@ -24,65 +25,70 @@ class _SecondPageState extends State<SecondPage> {
     _initWifi();
     _timer = Timer.periodic(Duration(seconds: 1), (timer) {
       fetchDataFromWebsite();
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+        DeviceOrientation.portraitDown,
+        DeviceOrientation.landscapeLeft,
+        DeviceOrientation.landscapeRight,
+      ]);
     });
   }
 
   String semaforoStatus = 'Carregando...';
 
   Future<void> fetchDataFromWebsite() async {
-  try {
-    final response = await http.get(Uri.parse("http://192.168.4.1/status"));
-    if (response.statusCode == 200) {
-      setState(() {
-        websiteData = response.body;
-        if (websiteData != _previousWebsiteData) {
-          _previousWebsiteData = websiteData;
-          _audioPlayed = false; // Reset audio control
-        }
-
-        if (!_audioPlayed) {
-          if (MediaQuery.of(context).orientation == Orientation.portrait) {
-            // Portrait mode filters
-            if (websiteData.contains('A verde')) {
-              _circleColor = Colors.green;
-              _playAudio('sinalverde.mp3');
-              // Execute actions for Green A
-            } else if (websiteData.contains('A vermelho')) {
-              _circleColor = Colors.red;
-              _playAudio('sinalvermelho.mp3');
-              // Execute actions for Red A
-            } else if (websiteData.contains('A piscando')) {
-              _circleColor = Colors.grey;
-              _playAudio('espera.mp3');
-              // Execute actions for Blinking A
-            }
-          } else {
-            // Landscape mode filters
-            if (websiteData.contains('B verde')) {
-              _circleColor = Colors.green;
-              _playAudio('sinalverde.mp3');
-              // Execute actions for Green B
-            } else if (websiteData.contains('B vermelho')) {
-              _circleColor = Colors.red;
-              _playAudio('sinalvermelho.mp3');
-              // Execute actions for Red B
-            } else if (websiteData.contains('B piscando')) {
-              _circleColor = Colors.grey;
-              _playAudio('espera.mp3');
-              // Execute actions for Blinking B
-            }
+    try {
+      final response = await http.get(Uri.parse("http://192.168.4.1/status"));
+      if (response.statusCode == 200) {
+        setState(() {
+          websiteData = response.body;
+          if (websiteData != _previousWebsiteData) {
+            _previousWebsiteData = websiteData;
+            _audioPlayed = false; // Reset audio control
           }
-          _audioPlayed = true; // Audio played
-        }
-      });
-    } else {
-      print("Failed to fetch data from website");
-    }
-  } catch (e) {
-    print("Error fetching data: $e");
-  }
-}
 
+          if (!_audioPlayed) {
+            if (MediaQuery.of(context).orientation == Orientation.portrait) {
+              // Portrait mode filters
+              if (websiteData.contains('A Verde')) {
+                _circleColor = Colors.green;
+                _playAudio('sinalverde.mp3');
+                // Execute actions for Green A
+              } else if (websiteData.contains('A Vermelho')) {
+                _circleColor = Colors.red;
+                _playAudio('sinalvermelho.mp3');
+                // Execute actions for Red A
+              } else if (websiteData.contains('A Piscando')) {
+                _circleColor = Colors.grey;
+                _playAudio('espera.mp3');
+                // Execute actions for Blinking A
+              }
+            } else {
+              // Landscape mode filters
+              if (websiteData.contains('B Vermelho')) {
+                _circleColor = Colors.green;
+                _playAudio('sinalverde.mp3');
+                // Execute actions for Green B
+              } else if (websiteData.contains('B Vermelho')) {
+                _circleColor = Colors.red;
+                _playAudio('sinalvermelho.mp3');
+                // Execute actions for Red B
+              } else if (websiteData.contains('B Piscando')) {
+                _circleColor = Colors.grey;
+                _playAudio('espera.mp3');
+                // Execute actions for Blinking B
+              }
+            }
+            _audioPlayed = true; // Audio played
+          }
+        });
+      } else {
+        print("Failed to fetch data from website");
+      }
+    } catch (e) {
+      print("Error fetching data: $e");
+    }
+  }
 
   Future<void> _initWifi() async {
     if (!await WiFiForIoTPlugin.isConnected()) {
@@ -98,7 +104,7 @@ class _SecondPageState extends State<SecondPage> {
     try {
       // Connect to Wi-Fi network
       bool isConnected = await WiFiForIoTPlugin.connect(
-        'semaforo2',
+        'Semaforo',
         password: '12345678',
         security: NetworkSecurity.WPA,
       );
@@ -127,40 +133,49 @@ class _SecondPageState extends State<SecondPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color(0xFF247BA0),
-      appBar: AppBar(
-        backgroundColor: Color(0xFF13293D),
-      ),
-      body: SafeArea(
-        top: true,
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: MediaQuery.of(context).size.width * 0.3,
-                height: MediaQuery.of(context).size.width * 0.3,
-                decoration: BoxDecoration(
-                  color: _circleColor,
-                  shape: BoxShape.circle,
-                ),
-                child: Center(
-                  child: Text(
-                    _circleColor == Colors.green ? 'Avançar' : _circleColor == Colors.red ? 'Parar' : _circleColor == Colors.grey ? 'Piscando' : 'Desconectado',
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: Colors.white,
-                      fontFamily: 'verdana',
+    return OrientationBuilder(
+        builder: (BuildContext context, Orientation orientation) {
+      return Scaffold(
+        backgroundColor: Color(0xFF247BA0),
+        appBar: AppBar(
+          backgroundColor: Color(0xFF13293D),
+        ),
+        body: SafeArea(
+          top: true,
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: MediaQuery.of(context).size.width * 0.3,
+                  height: MediaQuery.of(context).size.width * 0.3,
+                  decoration: BoxDecoration(
+                    color: _circleColor,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: Text(
+                      _circleColor == Colors.green
+                          ? 'Avançar'
+                          : _circleColor == Colors.red
+                              ? 'Parar'
+                              : _circleColor == Colors.grey
+                                  ? 'Piscando'
+                                  : 'Desconectado',
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.white,
+                        fontFamily: 'verdana',
+                      ),
                     ),
                   ),
                 ),
-              ),
-              SizedBox(height: 20),
-            ],
+                SizedBox(height: 20),
+              ],
+            ),
           ),
         ),
-      ),
-    );
+      );
+    });
   }
 }

@@ -30,41 +30,59 @@ class _SecondPageState extends State<SecondPage> {
   String semaforoStatus = 'Carregando...';
 
   Future<void> fetchDataFromWebsite() async {
-    try {
-      final response = await http.get(Uri.parse("http://192.168.4.1/status"));
-      if (response.statusCode == 200) {
-        setState(() {
-          websiteData = response.body;
-          if (websiteData != _previousWebsiteData) {
-            // Apenas quando há uma mudança de status
-            _previousWebsiteData = websiteData;
-            _audioPlayed = false; // Reset do controle de áudio
-          }
+  try {
+    final response = await http.get(Uri.parse("http://192.168.4.1/status"));
+    if (response.statusCode == 200) {
+      setState(() {
+        websiteData = response.body;
+        if (websiteData != _previousWebsiteData) {
+          _previousWebsiteData = websiteData;
+          _audioPlayed = false; // Reset audio control
+        }
 
-          if (!_audioPlayed) {
-            if (websiteData == 'Sinal Verde') {
+        if (!_audioPlayed) {
+          if (MediaQuery.of(context).orientation == Orientation.portrait) {
+            // Portrait mode filters
+            if (websiteData.contains('A verde')) {
               _circleColor = Colors.green;
               _playAudio('sinalverde.mp3');
-              // Execute actions for 'Sinal Verde'
-            } else if (websiteData == 'Sinal Vermelho') {
+              // Execute actions for Green A
+            } else if (websiteData.contains('A vermelho')) {
               _circleColor = Colors.red;
               _playAudio('sinalvermelho.mp3');
-              // Execute actions for 'Sinal Vermelho'
-            }
-            if (websiteData == 'Sinal Piscando') {
+              // Execute actions for Red A
+            } else if (websiteData.contains('A piscando')) {
               _circleColor = Colors.grey;
               _playAudio('espera.mp3');
+              // Execute actions for Blinking A
             }
-            _audioPlayed = true; // Áudio tocado
+          } else {
+            // Landscape mode filters
+            if (websiteData.contains('B verde')) {
+              _circleColor = Colors.green;
+              _playAudio('sinalverde.mp3');
+              // Execute actions for Green B
+            } else if (websiteData.contains('B vermelho')) {
+              _circleColor = Colors.red;
+              _playAudio('sinalvermelho.mp3');
+              // Execute actions for Red B
+            } else if (websiteData.contains('B piscando')) {
+              _circleColor = Colors.grey;
+              _playAudio('espera.mp3');
+              // Execute actions for Blinking B
+            }
           }
-        });
-      } else {
-        print("Failed to fetch data from website");
-      }
-    } catch (e) {
-      print("Error fetching data: $e");
+          _audioPlayed = true; // Audio played
+        }
+      });
+    } else {
+      print("Failed to fetch data from website");
     }
+  } catch (e) {
+    print("Error fetching data: $e");
   }
+}
+
 
   Future<void> _initWifi() async {
     if (!await WiFiForIoTPlugin.isConnected()) {
@@ -80,7 +98,7 @@ class _SecondPageState extends State<SecondPage> {
     try {
       // Connect to Wi-Fi network
       bool isConnected = await WiFiForIoTPlugin.connect(
-        'Semaforo',
+        'semaforo2',
         password: '12345678',
         security: NetworkSecurity.WPA,
       );

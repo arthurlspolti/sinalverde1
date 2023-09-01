@@ -2,7 +2,7 @@
     <application
         android:label="Sinal Verde"
         android:name="${applicationName}"
-        android:icon="@mipmap/sinal">
+        android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
             android:exported="true"

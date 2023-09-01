@@ -37,58 +37,54 @@ class _SecondPageState extends State<SecondPage> {
   String semaforoStatus = 'Carregando...';
 
   Future<void> fetchDataFromWebsite() async {
-    try {
-      final response = await http.get(Uri.parse("http://192.168.4.1/status"));
-      if (response.statusCode == 200) {
-        setState(() {
-          websiteData = response.body;
-          if (websiteData != _previousWebsiteData) {
-            _previousWebsiteData = websiteData;
-            _audioPlayed = false; // Reset audio control
-          }
+  try {
+    final response = await http.get(Uri.parse("http://192.168.4.1/status"));
+    if (response.statusCode == 200) {
+      setState(() {
+        websiteData = response.body;
+        if (websiteData != _previousWebsiteData) {
+          _previousWebsiteData = websiteData;
+          _audioPlayed = false;
+        }
 
-          if (!_audioPlayed) {
-            if (MediaQuery.of(context).orientation == Orientation.portrait) {
-              // Portrait mode filters
-              if (websiteData.contains('A Verde')) {
-                _circleColor = Colors.green;
-                _playAudio('sinalverde.mp3');
-                // Execute actions for Green A
-              } else if (websiteData.contains('A Vermelho')) {
-                _circleColor = Colors.red;
-                _playAudio('sinalvermelho.mp3');
-                // Execute actions for Red A
-              } else if (websiteData.contains('A Piscando')) {
-                _circleColor = Colors.grey;
-                _playAudio('espera.mp3');
-                // Execute actions for Blinking A
-              }
-            } else {
-              // Landscape mode filters
-              if (websiteData.contains('B Vermelho')) {
-                _circleColor = Colors.green;
-                _playAudio('sinalverde.mp3');
-                // Execute actions for Green B
-              } else if (websiteData.contains('B Vermelho')) {
-                _circleColor = Colors.red;
-                _playAudio('sinalvermelho.mp3');
-                // Execute actions for Red B
-              } else if (websiteData.contains('B Piscando')) {
-                _circleColor = Colors.grey;
-                _playAudio('espera.mp3');
-                // Execute actions for Blinking B
-              }
+        if (!_audioPlayed) {
+          Orientation orientation = MediaQuery.of(context).orientation;
+          if (orientation == Orientation.portrait) {
+            // Filtro para modo retrato
+            if (websiteData.contains('A Verde')) {
+              _circleColor = Colors.green;
+              _playAudio('sinalverde.mp3');
+            } else if (websiteData.contains('A Vermelho')) {
+              _circleColor = Colors.red;
+              _playAudio('sinalvermelho.mp3');
+            } else if (websiteData.contains('A Piscando')) {
+              _circleColor = Colors.grey;
+              _playAudio('espera.mp3');
             }
-            _audioPlayed = true; // Audio played
+          } else {
+            // Modo paisagem
+            if (websiteData.contains('B Vermelho')) {
+              _circleColor = Colors.green;
+              _playAudio('sinalverde.mp3');
+            } else if (websiteData.contains('B Vermelho')) {
+              _circleColor = Colors.red;
+              _playAudio('sinalvermelho.mp3');
+            } else if (websiteData.contains('B Piscando')) {
+              _circleColor = Colors.grey;
+              _playAudio('espera.mp3');
+            }
           }
-        });
-      } else {
-        print("Failed to fetch data from website");
-      }
-    } catch (e) {
-      print("Error fetching data: $e");
+          _audioPlayed = true;
+        }
+      });
+    } else {
+      print("Failed to fetch data from website");
     }
+  } catch (e) {
+    print("Error fetching data: $e");
   }
+}
+
 
   Future<void> _initWifi() async {
     if (!await WiFiForIoTPlugin.isConnected()) {

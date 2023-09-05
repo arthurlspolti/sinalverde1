@@ -15,7 +15,7 @@ class _MyTouchPageState extends State<MyTouchPage> {
   void initState() {
     super.initState();
 
-    Timer(Duration(seconds: 8), () {
+    Timer(Duration(seconds: 17), () {
       setState(() {
         _isButtonEnabled = true;
       });

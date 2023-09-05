@@ -96,7 +96,6 @@ class _SecondPageState extends State<SecondPage> {
       builder: (BuildContext context, Orientation orientation) {
         if (!_audioPlayed) {
           if (orientation == Orientation.portrait) {
-            SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
             // Lógica para orientação retrato
             if (websiteData.contains('A Verde')) {
               _circleColor = Colors.green;
@@ -109,7 +108,6 @@ class _SecondPageState extends State<SecondPage> {
               _playAudio('espera.mp3');
             }
           } else {
-            SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
             // Lógica para orientação paisagem
             if (websiteData.contains('B Verde')) {
               _circleColor = Colors.green;

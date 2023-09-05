@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'second_page.dart';
+import 'package:flutter/services.dart';
 
 class MyTouchPage extends StatefulWidget {
   @override
@@ -26,13 +27,22 @@ class _MyTouchPageState extends State<MyTouchPage> {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => SecondPage()),
-
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    // Detect the current device orientation
+    final Orientation orientation = MediaQuery.of(context).orientation;
+
+    // Lock the screen orientation to portrait or landscape as needed
+    SystemChrome.setPreferredOrientations([
+      orientation == Orientation.portrait
+          ? DeviceOrientation.portraitUp
+          : DeviceOrientation.landscapeLeft,
+    ]);
+
     return Scaffold(
       backgroundColor: Color(0xFF247BA0),
       body: GestureDetector(
@@ -56,5 +66,16 @@ class _MyTouchPageState extends State<MyTouchPage> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    // Reset the preferred screen orientations when disposing the widget
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
+    super.dispose();
   }
 }

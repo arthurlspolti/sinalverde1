@@ -6,6 +6,8 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/services.dart';
 
 class SecondPage extends StatefulWidget {
+  const SecondPage({super.key});
+
   @override
   _SecondPageState createState() => _SecondPageState();
 }
@@ -23,7 +25,7 @@ class _SecondPageState extends State<SecondPage> {
   void initState() {
     super.initState();
     _initWifi();
-    _timer = Timer.periodic(Duration(milliseconds: 800), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 2), (timer) {
       fetchDataFromWebsite();
     });
   }
@@ -124,9 +126,9 @@ class _SecondPageState extends State<SecondPage> {
         }
 
         return Scaffold(
-          backgroundColor: Color(0xFF247BA0),
+          backgroundColor: const Color(0xFF247BA0),
           appBar: AppBar(
-            backgroundColor: Color(0xFF13293D),
+            backgroundColor: const Color(0xFF13293D),
           ),
           body: SafeArea(
             top: true,
@@ -150,7 +152,7 @@ class _SecondPageState extends State<SecondPage> {
                                 : _circleColor == Colors.grey
                                     ? 'Piscando'
                                     : 'Desconectado',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 20,
                           color: Colors.white,
                           fontFamily: 'verdana',
@@ -158,7 +160,7 @@ class _SecondPageState extends State<SecondPage> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),

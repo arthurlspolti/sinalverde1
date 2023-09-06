@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class AnimatedHourglassIcon extends StatelessWidget {
+  const AnimatedHourglassIcon({super.key});
+
   @override
   Widget build(BuildContext context) {
     return TweenAnimationBuilder<double>(
@@ -9,7 +11,7 @@ class AnimatedHourglassIcon extends StatelessWidget {
       builder: (BuildContext context, double value, Widget? child) {
         return Transform.rotate(
           angle: value * 6.28319,
-          child: Icon(
+          child: const Icon(
             Icons.hourglass_empty,
             color: Color(0xFF13293D),
             size: 100,

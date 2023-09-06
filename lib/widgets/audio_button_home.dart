@@ -3,6 +3,8 @@ import 'package:audioplayers/audioplayers.dart';
 import '../screens/my_touch_page.dart'; // Importe a página correta
 
 class AudioButton extends StatefulWidget {
+  const AudioButton({super.key});
+
   @override
   _AudioButtonState createState() => _AudioButtonState();
 }
@@ -37,17 +39,17 @@ class _AudioButtonState extends State<AudioButton> {
           MaterialPageRoute(builder: (context) => MyTouchPage()),
         );
       },
-      child: SizedBox(
-        height: 1800,
-        width: 2000,
-        child: Image.asset('assets/microfone.png'),
-      ),
       style: ElevatedButton.styleFrom(
         primary: Color(0xFF247BA0),
         elevation: 3,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(0),
         ),
+      ),
+      child: SizedBox(
+        height: 1800,
+        width: 2000,
+        child: Image.asset('assets/microfone.png'),
       ),
     );
   }
